@@ -1,0 +1,16 @@
+# ===== 华理电费监控配置文件 =====
+# 配置文件位置：~/.config/edem/config.toml
+# 或者：./config.toml
+
+# ===== 账号信息 =====
+[account]
+username = "24010000"
+password   = "123456"
+
+# ===== 宿舍信息 =====
+[dorm]
+area     = 1
+district = 1
+building = 11
+floor    = 11
+room     = 111

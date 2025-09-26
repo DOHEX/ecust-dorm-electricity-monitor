@@ -1,0 +1,29 @@
+[project]
+name = "edem"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "DOHEX", email = "dohex@outlook.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "apscheduler>=3.11.0",
+    "beautifulsoup4>=4.13.5",
+    "dynaconf>=3.2.11",
+    "loguru>=0.7.3",
+    "playwright>=1.55.0",
+    "pydantic>=2.11.9",
+    "pydantic-settings>=2.10.1",
+    "python-dotenv>=1.1.1",
+    "requests>=2.32.5",
+    "rich>=14.1.0",
+    "typer>=0.19.2",
+]
+
+[project.scripts]
+edem = "edem.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
