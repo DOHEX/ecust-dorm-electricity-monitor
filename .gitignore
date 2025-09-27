@@ -9,6 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
+.idea
 # Ignore dynaconf secret files
 .secrets.*
 settings.toml
+.env

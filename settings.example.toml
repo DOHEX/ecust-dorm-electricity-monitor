@@ -4,13 +4,29 @@
 
 # ===== 账号信息 =====
 [account]
-username = "24010000"
-password   = "123456"
+username = "24011111"
+password = "123456"
 
 # ===== 宿舍信息 =====
 [dorm]
 area     = 1
 district = 1
 building = 11
-floor    = 11
+floor    = 1
 room     = 111
+
+
+[query]
+max_retries = 3
+retry_delay = 1.0 # 单位：秒
+
+[monitor]
+cron      = "* * * * *"
+threshold = 10.0        # 电量低于此值时推送通知
+
+[notify]
+enable  = true
+methods = ["pushplus"]
+
+[notify.pushplus]
+token = ""
