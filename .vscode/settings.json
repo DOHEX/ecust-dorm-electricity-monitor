@@ -1,7 +1,0 @@
-{
-  "editor.unicodeHighlight.ambiguousCharacters": false,
-  "python.analysis.typeCheckingMode": "off",
-  "python.testing.pytestArgs": ["tests"],
-  "python.testing.unittestEnabled": false,
-  "python.testing.pytestEnabled": true
-}
