@@ -1,17 +1,52 @@
-# Python-generated files
+
+# Python bytecode
 __pycache__/
-*.py[oc]
+*.py[cod]
+*.so
+*.pyd
+*.pyo
+
+# Distribution / packaging
 build/
 dist/
 wheels/
-*.egg-info
+*.egg-info/
+.eggs/
+MANIFEST
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
 
 # Virtual environments
-.venv
+.venv/
+venv/
+env/
+ENV/
 
-.idea
-.vscode
-# Ignore dynaconf secret files
+# IDE/editor configs
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets & local config
 .secrets.*
 settings.toml
 .env
+.env.*
+
+# Log files
+edem.log
+*.log
+
+# Test & coverage
+.pytest_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# OS files
+ehthumbs.db
+Desktop.ini

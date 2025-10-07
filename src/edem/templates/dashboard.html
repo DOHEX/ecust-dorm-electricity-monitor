@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>电费管理面板</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+  <body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto py-8">
+      <h1 class="text-3xl font-bold mb-6 text-center">电费管理面板</h1>
+      <div
+        class="flex flex-col md:flex-row gap-8 mb-8 justify-center items-center"
+      >
+        <div class="bg-white shadow rounded p-6 w-full md:w-1/3 text-center">
+          <div class="text-lg text-gray-500 mb-2">当前剩余电量</div>
+          <div id="remain-value" class="text-4xl font-bold text-blue-600">
+            加载中...
+          </div>
+          <a
+            href="{{ recharge_url }}"
+            target="_blank"
+            class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >快捷充值</a
+          >
+        </div>
+      </div>
+      <div class="bg-white shadow rounded p-6">
+        <h2 class="text-xl font-semibold mb-4">每日用电量统计</h2>
+        <canvas id="usageChart" height="120"></canvas>
+      </div>
+    </div>
+    <script>
+      // 异步获取剩余电量
+      fetch('/api/remain').then(r => r.json()).then(data => {
+          const el = document.getElementById('remain-value');
+          if (data.success && data.remain !== null && data.remain !== undefined) {
+              el.textContent = data.remain;
+          } else {
+              el.textContent = '暂无数据';
+          }
+      }).catch(() => {
+          document.getElementById('remain-value').textContent = '获取失败';
+      });
+
+      const usageData = {{ usage_data | tojson }};
+      const dates = usageData.map(item => item[0]);
+      const usages = usageData.map(item => item[1]);
+      const ctx = document.getElementById('usageChart').getContext('2d');
+      new Chart(ctx, {
+          type: 'bar',
+          data: {
+              labels: dates,
+              datasets: [{
+                  label: '用电量',
+                  data: usages,
+                  backgroundColor: 'rgba(59,130,246,0.5)',
+                  borderColor: 'rgba(59,130,246,1)',
+                  borderWidth: 1
+              }]
+          },
+          options: {
+              scales: {
+                  x: { title: { display: true, text: '日期' } },
+                  y: { title: { display: true, text: '用电量' }, beginAtZero: true }
+              }
+          }
+      });
+    </script>
+  </body>
+</html>

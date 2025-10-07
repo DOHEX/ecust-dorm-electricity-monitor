@@ -1,11 +1,15 @@
 # ===== 华理电费监控配置文件 =====
-# 配置文件位置：~/.config/edem/config.toml
-# 或者：./config.toml
 
 # ===== 账号信息 =====
 [account]
 username = "24011111"
 password = "123456"
+
+# ===== SSL-VPN =====
+[vpn]
+enable   = true
+username = ""
+password = ""
 
 # ===== 宿舍信息 =====
 [dorm]
@@ -15,18 +19,39 @@ building = 11
 floor    = 1
 room     = 111
 
-
+# ===== 单次查询 =====
 [query]
 max_retries = 3
 retry_delay = 1.0 # 单位：秒
 
+# ===== 电量监控 =====
 [monitor]
-cron      = "* * * * *"
-threshold = 10.0        # 电量低于此值时推送通知
+cron                  = "* * * * *"
+threshold             = 10.0        # 电量低于此值时推送通知
+record_daily_snapshot = false
 
+# ===== 通知 =====
 [notify]
 enable  = true
-methods = ["pushplus"]
+methods = ["pushplus"] #通知方式
 
+# ===== pushplus =====
 [notify.pushplus]
 token = ""
+
+# ===== server酱 =====
+[notify.serverchan]
+sendkey = ""
+
+# ===== email =====
+[notify.email]
+username = ""
+password = ""
+
+# ===== 日志 =====
+[log]
+level     = "INFO"                                                                                                                                                                # 可选: DEBUG, INFO, WARNING, ERROR
+file      = "edem.log"                                                                                                                                                            # 日志文件路径，留空则只输出到控制台
+rotation  = "10 MB"                                                                                                                                                               # 日志文件大小轮转
+retention = "7 days"                                                                                                                                                              # 日志保留时长
+format    = "<green>{time:YYYY-MM-DD HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"

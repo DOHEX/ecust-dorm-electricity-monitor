@@ -19,6 +19,13 @@ def notify(title: str, content: str, settings=settings) -> bool:
                     continue
                 if pushplus_notify(token=token, title=title, content=content):
                     success = True
+            elif method == "serverchan":
+                sendkey = getattr(settings.notify.serverchan, "sendkey", None)
+                if not sendkey:
+                    logger.warning("未配置 server酱 sendkey，无法推送")
+                    continue
+                if serverchan_notify(sendkey=sendkey, title=title, content=content):
+                    success = True
             else:
                 logger.warning(f"未知通知方式: {method}")
         except Exception as e:
@@ -29,11 +36,7 @@ def notify(title: str, content: str, settings=settings) -> bool:
 def pushplus_notify(token: str, title: str, content: str) -> bool:
     """通过 pushplus 推送消息"""
     url = "https://www.pushplus.plus/send"
-    data = {
-        "token": token,
-        "title": title,
-        "content": content,
-    }
+    data = {"token": token, "title": title, "content": content}
     try:
         resp = requests.post(url, json=data, timeout=10)
         resp.raise_for_status()
@@ -41,4 +44,44 @@ def pushplus_notify(token: str, title: str, content: str) -> bool:
         return True
     except Exception as e:
         logger.error(f"PushPlus 推送失败: {e}")
+        return False
+
+
+def serverchan_notify(sendkey: str, title: str, content: str) -> bool:
+    """通过 server酱 推送消息"""
+    url = f"https://sctapi.ftqq.com/{sendkey}.send"
+    data = {"title": title, "desp": content}
+    try:
+        resp = requests.post(url, data=data, timeout=10)
+        resp.raise_for_status()
+        if resp.json().get("code", -1) == 0:
+            logger.success("📢 Server酱推送成功")
+            return True
+        else:
+            logger.error(f"Server酱推送失败: {resp.text}")
+            return False
+    except Exception as e:
+        logger.error(f"Server酱推送异常: {e}")
+        return False
+
+
+def email_notify(
+    user: str,
+    password: str,
+    host: str,
+    port: int,
+    to: str,
+    subject: str,
+    body: str,
+) -> bool:
+    """发送邮件通知"""
+    import yagmail
+
+    try:
+        yag = yagmail.SMTP(user=user, password=password, host=host, port=port)
+        yag.send(to=to, subject=subject, contents=body)
+        logger.success("📧 邮件发送成功")
+        return True
+    except Exception as e:
+        logger.error(f"邮件发送失败: {e}")
         return False
