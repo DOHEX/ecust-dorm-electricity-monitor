@@ -1,52 +1,59 @@
-
-# Python bytecode
+*.pyc
 __pycache__/
 *.py[cod]
-*.so
-*.pyd
-*.pyo
+*$py.class
 
-# Distribution / packaging
-build/
-dist/
-wheels/
-*.egg-info/
-.eggs/
-MANIFEST
-pip-wheel-metadata/
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Virtual environments
-.venv/
+# 虚拟环境
 venv/
 env/
 ENV/
+.venv
 
-# IDE/editor configs
-.idea/
+# IDE
 .vscode/
-.DS_Store
-Thumbs.db
+.idea/
+*.swp
+*.swo
+*~
 
-# Secrets & local config
-.secrets.*
-settings.toml
-.env
-.env.*
-
-# Log files
-edem.log
+# 数据和日志
+data/
+logs/
 *.log
+*.csv
 
-# Test & coverage
+# 报告
+reports/
+*.html
+
+# 配置文件（包含敏感信息）
+.env
+config.toml
+
+# 分发和打包
+dist/
+build/
+*.egg-info/
+*.egg
+
+# 测试
 .pytest_cache/
 .coverage
 coverage.xml
 htmlcov/
+.tox/
 
-# OS files
-ehthumbs.db
-Desktop.ini
+# 类型检查
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini

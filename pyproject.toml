@@ -1,40 +1,87 @@
-[project]
-name = "edem"
-version = "0.1.0"
-description = "Add your description here"
-readme = "README.md"
-authors = [
-    { name = "DOHEX", email = "dohex@outlook.com" }
-]
-requires-python = ">=3.11"
-dependencies = [
-    "apscheduler>=3.11.0",
-    "beautifulsoup4>=4.13.5",
-    "dynaconf>=3.2.11",
-    "fastapi>=0.118.0",
-    "jinja2>=3.1.6",
-    "loguru>=0.7.3",
-    "playwright>=1.55.0",
-    "polars>=1.33.1",
-    "pydantic>=2.11.9",
-    "pydantic-settings>=2.10.1",
-    "python-dotenv>=1.1.1",
-    "requests>=2.32.5",
-    "rich>=14.1.0",
-    "typer>=0.19.2",
-    "uvicorn>=0.37.0",
-    "yagmail>=0.15.293",
-]
-
-[project.scripts]
-edem = "edem.cli:app"
-
 [build-system]
-requires = ["hatchling"]
+requires      = ["hatchling"]
 build-backend = "hatchling.build"
 
-[dependency-groups]
-dev = [
-    "pre-commit>=4.3.0",
-    "pytest>=8.4.2",
+[project]
+name = "ecust-electricity-monitor"
+version = "2.0.0"
+description = "宿舍用电监控系统 - Electricity Monitoring System"
+authors = [{ name = "ECUST Student" }]
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: System :: Monitoring",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    # HTML 解析
+    "requests>=2.32.5",
+    "beautifulsoup4>=4.14.3",
+    "lxml>=6.0.2",
+
+    # 配置管理
+    "pydantic-settings>=2.12.0",
+    "pydantic>=2.0.0",
+    "tomli>=2.0.0; python_version < '3.11'", # TOML 解析（Python 3.10 兼容）
+
+    # 模板引擎
+    "jinja2>=3.1.0",
+
+    # 现代 CLI
+    "typer[all]>=0.10.0",
+
+    # 日志
+    "loguru>=0.7.0",
+
+    # 数据和图表
+    "plotly>=5.18.0",
+
+    # 任务调度
+    "schedule>=1.2.0",
+
+    # 环境变量管理
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "pytest-cov>=4.0", "pytest-mock>=3.10.0", "ruff>=0.1.0"]
+web = ["flask>=3.0.0", "flask-httpauth>=4.8.0"]
+
+[project.scripts]
+emon = "ecust_electricity_monitor.cli:app"
+
+[project.urls]
+Homepage   = "https://github.com/DOHEX/ecust-dorm-electricity-monitor"
+Repository = "https://github.com/DOHEX/ecust-dorm-electricity-monitor"
+Issues     = "https://github.com/DOHEX/ecust-dorm-electricity-monitor/issues"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts   = "-v --cov=ecust_electricity_monitor --cov-report=term-missing"
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
 ]
