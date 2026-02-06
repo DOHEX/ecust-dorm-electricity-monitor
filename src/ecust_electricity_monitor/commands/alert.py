@@ -32,7 +32,7 @@ def alert_command(
 
         if not records:
             console.print("[yellow]⚠ 没有历史数据，请先运行 `emon fetch`[/yellow]")
-            raise typer.Exit(0)
+            return
 
         current_record = records[0]
         alert_threshold = threshold or config.app.alert_threshold_kwh
@@ -43,7 +43,7 @@ def alert_command(
                 f"[green]✓ 电量充足: {current_record.power:.1f} 度 "
                 f"(阈值: {alert_threshold} 度)[/green]"
             )
-            raise typer.Exit(0)
+            return  # ✅ 改为 return
 
         # 计算告警上下文
         analyzer = PowerAnalyzer(records)
