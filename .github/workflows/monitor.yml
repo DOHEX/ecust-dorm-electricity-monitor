@@ -52,7 +52,10 @@ jobs:
           echo "API__BUILDID=${{ secrets.API__BUILDID }}" >> $GITHUB_ENV
           echo "APP__LOG_LEVEL=INFO" >> $GITHUB_ENV
           
-          # 邮件配置（可选）
+          # 初始化通知渠道列表
+          CHANNELS="[]"
+          
+          # 邮件配置
           if [ -n "${{ secrets.NOTIFICATION__SMTP_HOST }}" ]; then
             echo "NOTIFICATION__SMTP_HOST=${{ secrets.NOTIFICATION__SMTP_HOST }}" >> $GITHUB_ENV
             echo "NOTIFICATION__SMTP_PORT=${{ secrets.NOTIFICATION__SMTP_PORT }}" >> $GITHUB_ENV
@@ -60,7 +63,30 @@ jobs:
             echo "NOTIFICATION__SMTP_USER=${{ secrets.NOTIFICATION__SMTP_USER }}" >> $GITHUB_ENV
             echo "NOTIFICATION__SMTP_PASSWORD=${{ secrets.NOTIFICATION__SMTP_PASSWORD }}" >> $GITHUB_ENV
             echo "NOTIFICATION__RECIPIENTS=${{ secrets.NOTIFICATION__RECIPIENTS }}" >> $GITHUB_ENV
+            CHANNELS='["email"]'
+            echo "✓ 已启用邮件通知"
           fi
+          
+          # Server酱配置（可选）
+          if [ -n "${{ secrets.NOTIFICATION__SERVERCHAN_SENDKEY }}" ]; then
+            echo "NOTIFICATION__SERVERCHAN_SENDKEY=${{ secrets.NOTIFICATION__SERVERCHAN_SENDKEY }}" >> $GITHUB_ENV
+            if [ "$CHANNELS" = "[]" ]; then
+              CHANNELS='["serverchan"]'
+            else
+              # 如果已有邮件，追加 serverchan
+              CHANNELS='["email", "serverchan"]'
+            fi
+            echo "✓ 已启用 Server酱微信通知"
+          fi
+          
+          # 设置最终的通知渠道
+          echo "NOTIFICATION__CHANNELS=$CHANNELS" >> $GITHUB_ENV
+          echo "通知配置: $CHANNELS"
+          
+          # 告警阈值（可选 Secret，默认 10.0）
+          ALERT_THRESHOLD="${{ secrets.ALERT_THRESHOLD_KWH || '10.0' }}"
+          echo "APP__ALERT_THRESHOLD_KWH=$ALERT_THRESHOLD" >> $GITHUB_ENV
+          echo "告警阈值: $ALERT_THRESHOLD 度"
       
       - name: 获取电量数据
         id: fetch
@@ -74,7 +100,9 @@ jobs:
       - name: 检查告警
         if: success()
         run: |
-          emon alert --threshold 30
+          # 使用配置文件中的阈值（环境变量会覆盖它）
+          # APP__ALERT_THRESHOLD_KWH 已在上一步设置
+          emon alert
       
       - name: 提交数据
         if: success()
