@@ -100,9 +100,9 @@ jobs:
       - name: 检查告警
         if: success()
         run: |
-          # 使用配置文件中的阈值（环境变量会覆盖它）
-          # APP__ALERT_THRESHOLD_KWH 已在上一步设置
-          emon alert
+          # 先测试不发送通知版本（确保电量检查正常）
+          # 如果通知已配置 Secret，改为：emon alert 
+          emon alert --no-send
       
       - name: 提交数据
         if: success()

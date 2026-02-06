@@ -65,17 +65,24 @@ def alert_command(
 
         # 发送告警通知
         if send_email and config.notification.is_configured:
-            notifier = NotificationManager(config.notification)
+            try:
+                notifier = NotificationManager(config.notification)
 
-            if notifier.should_send_alert(alert_context):
-                console.print("[yellow]正在发送告警通知...[/yellow]")
-                notifier.send_power_alert(alert_context)
-                console.print("[green]✓ 告警通知已发送[/green]")
-            else:
-                console.print("[dim]ℹ 在冷却时间内，跳过通知发送[/dim]")
+                if notifier.should_send_alert(alert_context):
+                    console.print("[yellow]正在发送告警通知...[/yellow]")
+                    notifier.send_power_alert(alert_context)
+                    console.print("[green]✓ 告警通知已发送[/green]")
+                else:
+                    console.print("[dim]ℹ 在冷却时间内，跳过通知发送[/dim]")
+            except Exception as notify_error:
+                console.print(f"[yellow]⚠ 通知发送失败: {notify_error}[/yellow]")
+                # 不中断主流程，只记录警告
         elif not config.notification.is_configured:
             console.print("[yellow]⚠ 通知未配置，跳过发送[/yellow]")
 
     except Exception as e:
         console.print(f"[red]✗ 告警检查失败: {e}[/red]")
+        import traceback
+
+        console.print(f"[dim]调试信息:\n{traceback.format_exc()}[/dim]")
         raise typer.Exit(1) from e
