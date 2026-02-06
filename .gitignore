@@ -16,6 +16,11 @@ ENV/
 *.swo
 *~
 
+# Claude/AI 配置（包含敏感 token）
+.claude/
+.cursor/
+.copilot/
+
 # 数据和日志
 data/logs/
 data/*.log
