@@ -33,18 +33,14 @@ jobs:
         with:
           fetch-depth: 0  # 获取完整历史
       
-      - name: 设置 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-          cache: 'uv'
-      
       - name: 安装 uv
         uses: astral-sh/setup-uv@v2
+        with:
+          enable-cache: true
       
-      - name: 安装依赖
+      - name: 同步项目依赖（自动安装 Python 3.14）
         run: |
-          uv pip install -e .
+          uv sync --frozen
       
       - name: 配置环境变量
         run: |
@@ -93,7 +89,7 @@ jobs:
       - name: 获取电量数据
         id: fetch
         run: |
-          emon fetch --verbose
+          uv run emon fetch --verbose
           
           # 读取最新电量值
           LATEST_POWER=$(tail -n 1 data/electricity.csv | cut -d',' -f2)
@@ -103,8 +99,8 @@ jobs:
         if: success()
         run: |
           # 先测试不发送通知版本（确保电量检查正常）
-          # 如果通知已配置 Secret，改为：emon alert 
-          emon alert --no-send
+          # 如果通知已配置 Secret，改为：uv run emon alert 
+          uv run emon alert --no-send
       
       - name: 提交数据
         if: success()
@@ -142,22 +138,18 @@ jobs:
       - name: 检出代码
         uses: actions/checkout@v4
       
-      - name: 设置 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.14'
-          cache: 'uv'
-      
       - name: 安装 uv
         uses: astral-sh/setup-uv@v2
+        with:
+          enable-cache: true
       
-      - name: 安装依赖
+      - name: 同步项目依赖（包含 web 选项）
         run: |
-          uv pip install -e ".[web]"
+          uv sync --frozen --extra web
       
       - name: 生成报告
         run: |
-          emon report --days 7 --no-open --output weekly_report.html
+          uv run emon report --days 7 --no-open --output weekly_report.html
       
       - name: 部署到 GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
