@@ -12,7 +12,7 @@
 # =============================================================================
 [app]
 # 电量告警阈值（度）- 低于此值时发送告警
-alert_threshold = 10.0
+alert_threshold_kwh = 10.0
 
 # 定时监控检查间隔（秒）默认 3600 = 1小时
 check_interval_seconds = 3600
@@ -24,13 +24,13 @@ log_level = "INFO"
 # =============================================================================
 # 客户端配置
 # =============================================================================
-[client]
+[api]
 # ECUST API 参数（敏感信息建议使用 .env 文件）
 # 如何获取：浏览器访问电费查询页面，F12 查看网络请求
-# sysid = ""     # 建议在 .env 中设置 CLIENT_SYSID
-# roomid = ""    # 建议在 .env 中设置 CLIENT_ROOMID
-# areaid = ""    # 建议在 .env 中设置 CLIENT_AREAID
-# buildid = ""   # 建议在 .env 中设置 CLIENT_BUILDID
+# sysid = ""     # 建议在 .env 中设置 API__SYSID
+# roomid = ""    # 建议在 .env 中设置 API__ROOMID
+# areaid = ""    # 建议在 .env 中设置 API__AREAID
+# buildid = ""   # 建议在 .env 中设置 API__BUILDID
 
 # 请求超时时间（秒）
 timeout_seconds = 10
@@ -54,9 +54,9 @@ csv_filename = "electricity.csv"
 # 通知配置
 # =============================================================================
 [notification]
-# 推送方式：email, serverchan, 或 "email,serverchan"（多个用逗号分隔）
+# 推送方式列表："email", "serverchan"
 # 留空则不发送通知
-methods = ""
+channels = []
 
 # 邮件通知配置
 # 常用 SMTP 配置：
@@ -65,7 +65,7 @@ methods = ""
 #   163:    smtp.163.com (端口 465, SSL)
 smtp_host = "smtp.gmail.com"
 smtp_port = 587
-smtp_use_tls = true
+smtp_starttls = true
 
 # 发件人邮箱（建议在 .env 中设置 NOTIFICATION_SMTP_USER）
 # smtp_user = ""

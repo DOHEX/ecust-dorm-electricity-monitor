@@ -47,7 +47,7 @@ def report_command(
             records=records,
             statistics=statistics,
             metadata={
-                "threshold": str(config.app.alert_threshold),
+                "threshold": str(config.app.alert_threshold_kwh),
                 "analysis_period": str(days),
             },
         )

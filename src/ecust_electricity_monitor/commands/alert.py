@@ -35,7 +35,7 @@ def alert_command(
             raise typer.Exit(0)
 
         current_record = records[0]
-        alert_threshold = threshold or config.app.alert_threshold
+        alert_threshold = threshold or config.app.alert_threshold_kwh
 
         # 检查是否需要告警
         if current_record.power > alert_threshold:

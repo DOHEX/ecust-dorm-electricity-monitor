@@ -194,7 +194,7 @@ class EmailNotifier(BaseNotifier):
                 f"连接到 SMTP 服务器: {self.config.smtp_host}:{self.config.smtp_port}"
             )
 
-            if self.config.smtp_use_tls:
+            if self.config.smtp_starttls:
                 server = smtplib.SMTP(self.config.smtp_host, self.config.smtp_port)
                 server.starttls()
             else:

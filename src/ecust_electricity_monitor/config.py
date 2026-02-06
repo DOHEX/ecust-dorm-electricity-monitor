@@ -15,24 +15,29 @@
 示例:
     # config.toml
     [app]
-    alert_threshold = 10.0
+    alert_threshold_kwh = 10.0
 
-    [client]
+    [api]
     sysid = "xxx"
 
     # .env（敏感信息）
-    CLIENT_SYSID=secret_value
-    NOTIFICATION_SMTP_PASSWORD=password
+    API__SYSID=secret_value
+    NOTIFICATION__SMTP_PASSWORD=password
 
     # 环境变量（最高优先级，支持嵌套）
-    export APP__ALERT_THRESHOLD=15.0
-    export CLIENT__SYSID=override_value
+    export APP__ALERT_THRESHOLD_KWH=15.0
+    export API__SYSID=override_value
 """
 
 from pathlib import Path
 
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import (
+    BaseSettings,
+    PydanticBaseSettingsSource,
+    SettingsConfigDict,
+    TomlConfigSettingsSource,
+)
 
 from .constants import DEFAULT_ALERT_THRESHOLD, MAX_RETRIES
 
@@ -49,8 +54,8 @@ ENV_FILE = ROOT_DIR / ".env"
 class AppConfig(BaseModel):
     """应用通用配置"""
 
-    alert_threshold: float = Field(
-        default=DEFAULT_ALERT_THRESHOLD, description="告警阈值（度）"
+    alert_threshold_kwh: float = Field(
+        default=DEFAULT_ALERT_THRESHOLD, description="告警阈值（度/kWh）"
     )
     check_interval_seconds: int = Field(
         default=86400, description="检查间隔（秒），默认每天1次"
@@ -70,8 +75,8 @@ class StorageConfig(BaseModel):
         return ROOT_DIR / self.data_dir / self.csv_filename
 
 
-class ClientConfig(BaseModel):
-    """电量客户端配置"""
+class ApiConfig(BaseModel):
+    """电量 API 配置"""
 
     sysid: str | None = Field(default=None, description="系统ID")
     roomid: str | None = Field(default=None, description="房间ID")
@@ -90,12 +95,12 @@ class NotificationConfig(BaseModel):
     """通知配置"""
 
     # 推送方式: email, serverchan, 或 email,serverchan（多个用逗号分隔）
-    methods: str = Field(default="", description="推送方式（email/serverchan）")
+    channels: list[str] = Field(default_factory=list, description="推送方式列表")
 
     # 邮件配置
     smtp_host: str | None = Field(default=None, description="SMTP服务器")
     smtp_port: int = Field(default=587, description="SMTP端口")
-    smtp_use_tls: bool = Field(default=True, description="是否使用TLS")
+    smtp_starttls: bool = Field(default=True, description="是否使用STARTTLS")
     smtp_user: str | None = Field(default=None, description="SMTP用户名")
     smtp_password: str | None = Field(
         default=None, description="SMTP密码（仅从环境变量）"
@@ -106,11 +111,9 @@ class NotificationConfig(BaseModel):
     serverchan_sendkey: str | None = Field(default=None, description="Server酱SendKey")
 
     @property
-    def enabled_methods(self) -> list[str]:
+    def enabled_channels(self) -> list[str]:
         """获取启用的推送方式列表"""
-        if not self.methods:
-            return []
-        return [m.strip() for m in self.methods.split(",") if m.strip()]
+        return [c.strip().lower() for c in self.channels if c.strip()]
 
     @property
     def is_email_configured(self) -> bool:
@@ -127,12 +130,12 @@ class NotificationConfig(BaseModel):
     @property
     def is_configured(self) -> bool:
         """检查是否至少配置了一种推送方式"""
-        methods = self.enabled_methods
-        if "email" in methods and not self.is_email_configured:
+        channels = self.enabled_channels
+        if "email" in channels and not self.is_email_configured:
             return False
-        if "serverchan" in methods and not self.is_serverchan_configured:
+        if "serverchan" in channels and not self.is_serverchan_configured:
             return False
-        return len(methods) > 0
+        return len(channels) > 0
 
 
 class ReportConfig(BaseModel):
@@ -158,14 +161,14 @@ class Settings(BaseSettings):
 
     示例：
         # 环境变量访问嵌套字段（使用双下划线）
-        export APP__ALERT_THRESHOLD=15.0
-        export CLIENT__SYSID=xxx
+        export APP__ALERT_THRESHOLD_KWH=15.0
+        export API__SYSID=xxx
         export NOTIFICATION__SMTP_HOST=smtp.gmail.com
     """
 
     app: AppConfig = Field(default_factory=AppConfig)
     storage: StorageConfig = Field(default_factory=StorageConfig)
-    client: ClientConfig = Field(default_factory=ClientConfig)
+    api: ApiConfig = Field(default_factory=ApiConfig)
     notification: NotificationConfig = Field(default_factory=NotificationConfig)
     report: ReportConfig = Field(default_factory=ReportConfig)
 
@@ -182,12 +185,29 @@ class Settings(BaseSettings):
         case_sensitive=False,
     )
 
+    @classmethod
+    def settings_customise_sources(
+        cls,
+        settings_cls: type[BaseSettings],
+        init_settings: PydanticBaseSettingsSource,
+        env_settings: PydanticBaseSettingsSource,
+        dotenv_settings: PydanticBaseSettingsSource,
+        file_secret_settings: PydanticBaseSettingsSource,
+    ) -> tuple[PydanticBaseSettingsSource, ...]:
+        return (
+            init_settings,
+            env_settings,
+            dotenv_settings,
+            TomlConfigSettingsSource(settings_cls),
+            file_secret_settings,
+        )
+
     def __repr__(self) -> str:
         return (
             f"Settings(\n"
-            f"  alert_threshold={self.app.alert_threshold},\n"
+            f"  alert_threshold_kwh={self.app.alert_threshold_kwh},\n"
             f"  data_dir={self.storage.data_dir},\n"
-            f"  notification_methods={self.notification.methods}\n"
+            f"  notification_channels={self.notification.channels}\n"
             f")"
         )
 
@@ -196,8 +216,7 @@ def create_env_template() -> str:
     """创建 .env 配置文件模板
 
     注意：环境变量现在支持两种格式：
-    1. 旧格式（兼容）: CLIENT_SYSID, NOTIFICATION_SMTP_HOST, APP_ALERT_THRESHOLD
-    2. 嵌套格式（推荐）: CLIENT__SYSID, NOTIFICATION__SMTP_HOST, APP__ALERT_THRESHOLD
+    - 嵌套格式（推荐）: API__SYSID, NOTIFICATION__SMTP_HOST, APP__ALERT_THRESHOLD_KWH
     """
     template = """# ⚡ ECUST 电量监控系统配置文件
 # 
@@ -211,16 +230,16 @@ def create_env_template() -> str:
 # =============================================================================
 # 获取方法：浏览器访问 ECUST 电费查询页面，按 F12 查看网络请求中的参数
 
-CLIENT__SYSID=your_sysid_here
-CLIENT__ROOMID=your_roomid_here
-CLIENT__AREAID=your_areaid_here
-CLIENT__BUILDID=your_buildid_here
+API__SYSID=your_sysid_here
+API__ROOMID=your_roomid_here
+API__AREAID=your_areaid_here
+API__BUILDID=your_buildid_here
 
 # =============================================================================
 # 应用配置（可选）
 # =============================================================================
 
-# APP__ALERT_THRESHOLD=30.0
+# APP__ALERT_THRESHOLD_KWH=30.0
 # APP__CHECK_INTERVAL_SECONDS=3600
 # APP__LOG_LEVEL=INFO
 
@@ -229,12 +248,12 @@ CLIENT__BUILDID=your_buildid_here
 # =============================================================================
 # 推送方式：email（邮件）、serverchan（Server酱）或 email,serverchan（两者都用）
 
-# NOTIFICATION__METHODS=email,serverchan
+# NOTIFICATION__CHANNELS=["email", "serverchan"]
 
 # --- 邮件通知 ---
 # NOTIFICATION__SMTP_HOST=smtp.gmail.com
 # NOTIFICATION__SMTP_PORT=587
-# NOTIFICATION__SMTP_USE_TLS=true
+# NOTIFICATION__SMTP_STARTTLS=true
 # NOTIFICATION__SMTP_USER=your_email@gmail.com
 # NOTIFICATION__SMTP_PASSWORD=your_app_password
 # NOTIFICATION__RECIPIENTS=["recipient@example.com"]
@@ -261,15 +280,17 @@ def ensure_config_exists() -> bool:
 
 
 # 全局配置实例
-config = Settings()
+settings = Settings()
+config = settings
 
 
 __all__ = [
+    "settings",
     "config",
     "Settings",
     "AppConfig",
     "StorageConfig",
-    "ClientConfig",
+    "ApiConfig",
     "NotificationConfig",
     "ReportConfig",
     "ROOT_DIR",

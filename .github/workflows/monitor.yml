@@ -4,6 +4,8 @@ on:
   schedule:
     # 每小时运行一次（UTC时间）
     - cron: '0 * * * *'
+    # 每周日 00:00 UTC 运行报告
+    - cron: '0 0 * * 0'
   
   workflow_dispatch:  # 允许手动触发
   
@@ -15,6 +17,10 @@ on:
 
 permissions:
   contents: write  # 允许提交数据
+
+concurrency:
+  group: monitor-data
+  cancel-in-progress: false
 
 jobs:
   monitor:
@@ -40,20 +46,20 @@ jobs:
       
       - name: 配置环境变量
         run: |
-          echo "FETCHER_SYSID=${{ secrets.FETCHER_SYSID }}" >> $GITHUB_ENV
-          echo "FETCHER_ROOMID=${{ secrets.FETCHER_ROOMID }}" >> $GITHUB_ENV
-          echo "FETCHER_AREAID=${{ secrets.FETCHER_AREAID }}" >> $GITHUB_ENV
-          echo "FETCHER_BUILDID=${{ secrets.FETCHER_BUILDID }}" >> $GITHUB_ENV
-          echo "APP_LOG_LEVEL=INFO" >> $GITHUB_ENV
+          echo "API__SYSID=${{ secrets.API__SYSID }}" >> $GITHUB_ENV
+          echo "API__ROOMID=${{ secrets.API__ROOMID }}" >> $GITHUB_ENV
+          echo "API__AREAID=${{ secrets.API__AREAID }}" >> $GITHUB_ENV
+          echo "API__BUILDID=${{ secrets.API__BUILDID }}" >> $GITHUB_ENV
+          echo "APP__LOG_LEVEL=INFO" >> $GITHUB_ENV
           
           # 邮件配置（可选）
-          if [ -n "${{ secrets.NOTIFICATION_SMTP_HOST }}" ]; then
-            echo "NOTIFICATION_SMTP_HOST=${{ secrets.NOTIFICATION_SMTP_HOST }}" >> $GITHUB_ENV
-            echo "NOTIFICATION_SMTP_PORT=${{ secrets.NOTIFICATION_SMTP_PORT }}" >> $GITHUB_ENV
-            echo "NOTIFICATION_SMTP_USE_TLS=${{ secrets.NOTIFICATION_SMTP_USE_TLS }}" >> $GITHUB_ENV
-            echo "NOTIFICATION_SMTP_USER=${{ secrets.NOTIFICATION_SMTP_USER }}" >> $GITHUB_ENV
-            echo "NOTIFICATION_SMTP_PASSWORD=${{ secrets.NOTIFICATION_SMTP_PASSWORD }}" >> $GITHUB_ENV
-            echo "NOTIFICATION_RECIPIENTS=${{ secrets.NOTIFICATION_RECIPIENTS }}" >> $GITHUB_ENV
+          if [ -n "${{ secrets.NOTIFICATION__SMTP_HOST }}" ]; then
+            echo "NOTIFICATION__SMTP_HOST=${{ secrets.NOTIFICATION__SMTP_HOST }}" >> $GITHUB_ENV
+            echo "NOTIFICATION__SMTP_PORT=${{ secrets.NOTIFICATION__SMTP_PORT }}" >> $GITHUB_ENV
+            echo "NOTIFICATION__SMTP_STARTTLS=${{ secrets.NOTIFICATION__SMTP_STARTTLS }}" >> $GITHUB_ENV
+            echo "NOTIFICATION__SMTP_USER=${{ secrets.NOTIFICATION__SMTP_USER }}" >> $GITHUB_ENV
+            echo "NOTIFICATION__SMTP_PASSWORD=${{ secrets.NOTIFICATION__SMTP_PASSWORD }}" >> $GITHUB_ENV
+            echo "NOTIFICATION__RECIPIENTS=${{ secrets.NOTIFICATION__RECIPIENTS }}" >> $GITHUB_ENV
           fi
       
       - name: 获取电量数据
@@ -75,6 +81,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase
           git add data/electricity.csv
           
           if git diff --staged --quiet; then
@@ -124,7 +131,7 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./reports
+          publish_dir: ./output/reports
           publish_branch: gh-pages
           keep_files: true
       
@@ -132,5 +139,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: weekly-report
-          path: reports/weekly_report.html
+          path: output/reports/weekly_report.html
           retention-days: 30

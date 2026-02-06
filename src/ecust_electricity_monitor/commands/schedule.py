@@ -17,7 +17,7 @@ from ..models import AlertContext, ElectricityRecord
 from ..notifiers import NotificationManager
 from ..scheduler import SchedulerService
 from ..storage import CSVRepository
-from .base import check_client_config, console
+from .base import check_api_config, console
 
 
 def schedule_command(
@@ -30,7 +30,7 @@ def schedule_command(
 ) -> None:
     """启动定时监控任务"""
     # 检查配置
-    check_client_config()
+    check_api_config()
 
     try:
         check_interval = interval or config.app.check_interval_seconds
@@ -39,7 +39,7 @@ def schedule_command(
             Panel.fit(
                 f"[bold green]电量监控任务已启动[/bold green]\n\n"
                 f"检查间隔: [cyan]{check_interval}[/cyan] 秒\n"
-                f"告警阈值: [cyan]{config.app.alert_threshold}[/cyan] 度\n"
+                f"告警阈值: [cyan]{config.app.alert_threshold_kwh}[/cyan] 度\n"
                 f"数据存储: [cyan]{config.storage.csv_path}[/cyan]\n\n"
                 f"按 [red]Ctrl+C[/red] 停止",
                 title="⚡ emon scheduler",
@@ -48,12 +48,12 @@ def schedule_command(
 
         # 创建组件
         client = ElectricityClient(
-            sysid=config.client.sysid,
-            roomid=config.client.roomid,
-            areaid=config.client.areaid,
-            buildid=config.client.buildid,
-            timeout=config.client.timeout_seconds,
-            max_retries=config.client.max_retries,
+            sysid=config.api.sysid,
+            roomid=config.api.roomid,
+            areaid=config.api.areaid,
+            buildid=config.api.buildid,
+            timeout=config.api.timeout_seconds,
+            max_retries=config.api.max_retries,
         )
         storage = CSVRepository(config.storage.csv_path)
         notifier = NotificationManager(config.notification)
@@ -80,7 +80,7 @@ def schedule_command(
                     storage.save(record)
 
                     # 检查告警
-                    if record.power < config.app.alert_threshold:
+                    if record.power < config.app.alert_threshold_kwh:
                         records = storage.find_recent(days=7)
                         analyzer = PowerAnalyzer(records)
                         trend = analyzer.calculate_trend()
@@ -89,7 +89,7 @@ def schedule_command(
 
                         alert_ctx = AlertContext(
                             current_record=record,
-                            threshold=config.app.alert_threshold,
+                            threshold=config.app.alert_threshold_kwh,
                             trend=trend,
                             history=records[:10],
                             daily_consumption=daily,

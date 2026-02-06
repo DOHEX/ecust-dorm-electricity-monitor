@@ -25,10 +25,10 @@ Server酱是一个将消息推送到微信的服务，非常适合用于监控�
 
 ```bash
 # 启用 Server酱推送
-NOTIFICATION_METHODS=serverchan
+NOTIFICATION__CHANNELS=["serverchan"]
 
 # 填写 SendKey
-NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
+NOTIFICATION__SERVERCHAN_SENDKEY=SCT123456abcdef
 ```
 
 ### 3. 同时使用邮件和微信推送
@@ -37,18 +37,18 @@ NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
 
 ```bash
 # 启用多种推送方式
-NOTIFICATION_METHODS=email,serverchan
+NOTIFICATION__CHANNELS=["email", "serverchan"]
 
 # 邮件配置
-NOTIFICATION_SMTP_HOST=smtp.gmail.com
-NOTIFICATION_SMTP_PORT=587
-NOTIFICATION_SMTP_USE_TLS=true
-NOTIFICATION_SMTP_USER=your_email@gmail.com
-NOTIFICATION_SMTP_PASSWORD=your_app_password
-NOTIFICATION_RECIPIENTS=recipient@example.com
+NOTIFICATION__SMTP_HOST=smtp.gmail.com
+NOTIFICATION__SMTP_PORT=587
+NOTIFICATION__SMTP_STARTTLS=true
+NOTIFICATION__SMTP_USER=your_email@gmail.com
+NOTIFICATION__SMTP_PASSWORD=your_app_password
+NOTIFICATION__RECIPIENTS=["recipient@example.com"]
 
 # Server酱配置
-NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
+NOTIFICATION__SERVERCHAN_SENDKEY=SCT123456abcdef
 ```
 
 ## 使用
@@ -103,7 +103,7 @@ emon schedule
 
 ### Q: 能否只使用 Server酱，不用邮件？
 
-可以。设置 `NOTIFICATION_METHODS=serverchan` 即可。
+可以。设置 `NOTIFICATION__CHANNELS=["serverchan"]` 即可。
 
 ### Q: 支持其他推送方式吗？
 
@@ -148,10 +148,10 @@ emon schedule
 
 ```bash
 # 推送方式配置
-NOTIFICATION_METHODS=serverchan
+NOTIFICATION__CHANNELS=["serverchan"]
 
 # Server酱配置
-NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
+NOTIFICATION__SERVERCHAN_SENDKEY=SCT123456abcdef
 ```
 
 #### 方式二：`config.toml` 文件
@@ -160,7 +160,7 @@ NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
 
 ```toml
 [notification]
-methods = "serverchan"
+channels = ["serverchan"]
 serverchan_sendkey = "SCT123456abcdef"
 ```
 
@@ -170,18 +170,18 @@ serverchan_sendkey = "SCT123456abcdef"
 
 ```bash
 # .env 文件
-NOTIFICATION_METHODS=email,serverchan
+NOTIFICATION__CHANNELS=["email", "serverchan"]
 
 # 邮件配置
-NOTIFICATION_SMTP_HOST=smtp.gmail.com
-NOTIFICATION_SMTP_PORT=587
-NOTIFICATION_SMTP_USE_TLS=true
-NOTIFICATION_SMTP_USER=your_email@gmail.com
-NOTIFICATION_SMTP_PASSWORD=your_app_password
-NOTIFICATION_RECIPIENTS=recipient@example.com
+NOTIFICATION__SMTP_HOST=smtp.gmail.com
+NOTIFICATION__SMTP_PORT=587
+NOTIFICATION__SMTP_STARTTLS=true
+NOTIFICATION__SMTP_USER=your_email@gmail.com
+NOTIFICATION__SMTP_PASSWORD=your_app_password
+NOTIFICATION__RECIPIENTS=["recipient@example.com"]
 
 # Server酱配置
-NOTIFICATION_SERVERCHAN_SENDKEY=SCT123456abcdef
+NOTIFICATION__SERVERCHAN_SENDKEY=SCT123456abcdef
 ```
 
 ## 使用示例
@@ -242,7 +242,7 @@ emon schedule
 
 ### Q: 能否只使用 Server酱，不用邮件？
 
-可以。设置 `NOTIFICATION_METHODS=serverchan` 即可。
+可以。设置 `NOTIFICATION__CHANNELS=["serverchan"]` 即可。
 
 ### Q: 推送消息延迟多久？
 

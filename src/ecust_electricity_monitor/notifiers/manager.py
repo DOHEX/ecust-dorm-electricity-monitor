@@ -44,14 +44,14 @@ class NotificationManager:
 
         根据配置的推送方式，动态创建相应的通知器实例。
         """
-        enabled_methods = self.config.enabled_methods
+        enabled_channels = self.config.enabled_channels
 
-        if not enabled_methods:
+        if not enabled_channels:
             logger.warning("未配置任何推送方式")
             return
 
         # 初始化邮件通知器
-        if "email" in enabled_methods:
+        if "email" in enabled_channels:
             if self.config.is_email_configured:
                 notifier = EmailNotifier(self.config)
                 self._notifiers.append(notifier)
@@ -60,7 +60,7 @@ class NotificationManager:
                 logger.warning("邮件推送已启用但配置不完整，跳过")
 
         # 初始化 Server酱 通知器
-        if "serverchan" in enabled_methods:
+        if "serverchan" in enabled_channels:
             if self.config.is_serverchan_configured:
                 notifier = ServerChanNotifier(self.config.serverchan_sendkey)
                 self._notifiers.append(notifier)

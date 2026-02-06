@@ -57,11 +57,11 @@ cp config.toml.example config.toml
 
 ```toml
 [app]
-alert_threshold = 10.0  # 告警阈值（度）
+alert_threshold_kwh = 10.0  # 告警阈值（度/kWh）
 check_interval_seconds = 3600  # 检查间隔（秒）
 
 [notification]
-methods = "email,serverchan"  # 推送方式
+channels = ["email", "serverchan"]  # 推送方式列表
 ```
 
 **步骤 2：创建 .env（敏感信息）**
@@ -74,16 +74,16 @@ cp .env.example .env
 
 ```bash
 # 必填：ECUST API 参数
-CLIENT_SYSID=your_sysid
-CLIENT_ROOMID=your_roomid
-CLIENT_AREAID=your_areaid
-CLIENT_BUILDID=your_buildid
+API__SYSID=your_sysid
+API__ROOMID=your_roomid
+API__AREAID=your_areaid
+API__BUILDID=your_buildid
 
 # 可选：邮件密码
-NOTIFICATION_SMTP_PASSWORD=your_app_password
+NOTIFICATION__SMTP_PASSWORD=your_app_password
 
 # 可选：Server酱 SendKey
-NOTIFICATION_SERVERCHAN_SENDKEY=your_sendkey
+NOTIFICATION__SERVERCHAN_SENDKEY=your_sendkey
 ```
 
 #### GitHub Actions 用户特别提示
@@ -92,17 +92,17 @@ NOTIFICATION_SERVERCHAN_SENDKEY=your_sendkey
 
 1. Settings → Secrets and variables → Actions
 2. 添加 Secrets（会作为环境变量）：
-   - `CLIENT_SYSID`
-   - `CLIENT_ROOMID`
-   - `CLIENT_AREAID`
-   - `CLIENT_BUILDID`
-   - `NOTIFICATION_SMTP_PASSWORD`（可选）
-   - `NOTIFICATION_SERVERCHAN_SENDKEY`（可选）
+   - `API__SYSID`
+   - `API__ROOMID`
+   - `API__AREAID`
+   - `API__BUILDID`
+   - `NOTIFICATION__SMTP_PASSWORD`（可选）
+   - `NOTIFICATION__SERVERCHAN_SENDKEY`（可选）
 3. 非敏感配置可直接在工作流中设置：
    ```yaml
    env:
-     APP_ALERT_THRESHOLD: 10.0
-     NOTIFICATION_METHODS: serverchan
+   APP__ALERT_THRESHOLD_KWH: 10.0
+   NOTIFICATION__CHANNELS: '["serverchan"]'
    ```
 
 <details>
@@ -125,7 +125,7 @@ NOTIFICATION_SERVERCHAN_SENDKEY=your_sendkey
 2. 获取 SendKey
 3. 关注「Server酱Turbo」公众号
 4. 将 SendKey 填入 `.env` 文件
-5. 设置 `NOTIFICATION_METHODS=serverchan`
+5. 设置 `NOTIFICATION__CHANNELS=["serverchan"]`
 
 详见 [Server酱配置指南](docs/SERVERCHAN_GUIDE.md)
 
@@ -205,10 +205,10 @@ emon info  # 显示配置和数据统计
 
 1. Fork 本仓库
 2. 在仓库设置添加 Secrets：
-   - `CLIENT_SYSID`
-   - `CLIENT_ROOMID`
-   - `CLIENT_AREAID`
-   - `CLIENT_BUILDID`
+   - `API__SYSID`
+   - `API__ROOMID`
+   - `API__AREAID`
+   - `API__BUILDID`
    - （可选）邮件/Server酱配置
 3. 启用 Actions（Settings → Actions → General → Allow all actions）
 4. 自动运行：每小时采集数据，低电量告警
@@ -432,26 +432,26 @@ cp .env.example .env
 
 ```bash
 # 必填：ECUST API 参数
-CLIENT_SYSID=your_sysid_here
-CLIENT_ROOMID=your_roomid_here
-CLIENT_AREAID=your_areaid_here
-CLIENT_BUILDID=your_buildid_here
+API__SYSID=your_sysid_here
+API__ROOMID=your_roomid_here
+API__AREAID=your_areaid_here
+API__BUILDID=your_buildid_here
 
 # 可选：推送通知
 # 推送方式：email（邮件）、serverchan（Server酱）或 email,serverchan（两者都用）
-NOTIFICATION_METHODS=email,serverchan
+NOTIFICATION__CHANNELS=["email", "serverchan"]
 
 # 邮件通知配置
-NOTIFICATION_SMTP_HOST=smtp.gmail.com
-NOTIFICATION_SMTP_PORT=587
-NOTIFICATION_SMTP_USE_TLS=true
-NOTIFICATION_SMTP_USER=your_email@gmail.com
-NOTIFICATION_SMTP_PASSWORD=your_app_password
-NOTIFICATION_RECIPIENTS=recipient@example.com
+NOTIFICATION__SMTP_HOST=smtp.gmail.com
+NOTIFICATION__SMTP_PORT=587
+NOTIFICATION__SMTP_STARTTLS=true
+NOTIFICATION__SMTP_USER=your_email@gmail.com
+NOTIFICATION__SMTP_PASSWORD=your_app_password
+NOTIFICATION__RECIPIENTS=["recipient@example.com"]
 
 # Server酱（微信推送）配置
 # 获取 SendKey：访问 https://sct.ftqq.com/ 注册并获取
-NOTIFICATION_SERVERCHAN_SENDKEY=your_sendkey_here
+NOTIFICATION__SERVERCHAN_SENDKEY=your_sendkey_here
 ```
 
 <details>
@@ -473,8 +473,8 @@ NOTIFICATION_SERVERCHAN_SENDKEY=your_sendkey_here
 1. 访问 [Server酱官网](https://sct.ftqq.com/)
 2. 使用微信扫码登录
 3. 在「发送消息」页面获取 SendKey
-4. 将 SendKey 填入 `.env` 文件的 `NOTIFICATION_SERVERCHAN_SENDKEY`
-5. 设置 `NOTIFICATION_METHODS=serverchan` 或 `email,serverchan`
+4. 将 SendKey 填入 `.env` 文件的 `NOTIFICATION__SERVERCHAN_SENDKEY`
+5. 设置 `NOTIFICATION__CHANNELS=["serverchan"]` 或 `["email", "serverchan"]`
 6. 关注 Server酱 公众号即可接收推送
 
 **优势：**
@@ -651,11 +651,11 @@ emon info
 <summary>Gmail</summary>
 
 ```bash
-NOTIFICATION_SMTP_HOST=smtp.gmail.com
-NOTIFICATION_SMTP_PORT=587
-NOTIFICATION_SMTP_USE_TLS=true
-NOTIFICATION_SMTP_USER=your_email@gmail.com
-NOTIFICATION_SMTP_PASSWORD=your_app_password  # 需要生成应用专用密码
+NOTIFICATION__SMTP_HOST=smtp.gmail.com
+NOTIFICATION__SMTP_PORT=587
+NOTIFICATION__SMTP_STARTTLS=true
+NOTIFICATION__SMTP_USER=your_email@gmail.com
+NOTIFICATION__SMTP_PASSWORD=your_app_password  # 需要生成应用专用密码
 ```
 
 应用专用密码生成：https://myaccount.google.com/apppasswords
@@ -666,11 +666,11 @@ NOTIFICATION_SMTP_PASSWORD=your_app_password  # 需要生成应用专用密码
 <summary>QQ 邮箱</summary>
 
 ```bash
-NOTIFICATION_SMTP_HOST=smtp.qq.com
-NOTIFICATION_SMTP_PORT=587
-NOTIFICATION_SMTP_USE_TLS=true
-NOTIFICATION_SMTP_USER=your_qq@qq.com
-NOTIFICATION_SMTP_PASSWORD=your_authorization_code  # QQ 邮箱授权码
+NOTIFICATION__SMTP_HOST=smtp.qq.com
+NOTIFICATION__SMTP_PORT=587
+NOTIFICATION__SMTP_STARTTLS=true
+NOTIFICATION__SMTP_USER=your_qq@qq.com
+NOTIFICATION__SMTP_PASSWORD=your_authorization_code  # QQ 邮箱授权码
 ```
 
 授权码获取：https://service.mail.qq.com/cgi-bin/help?subtype=1&&id=28&&no=1001256
@@ -681,11 +681,11 @@ NOTIFICATION_SMTP_PASSWORD=your_authorization_code  # QQ 邮箱授权码
 <summary>163 邮箱</summary>
 
 ```bash
-NOTIFICATION_SMTP_HOST=smtp.163.com
-NOTIFICATION_SMTP_PORT=465
-NOTIFICATION_SMTP_USE_TLS=false  # 163 使用 SSL
-NOTIFICATION_SMTP_USER=your_email@163.com
-NOTIFICATION_SMTP_PASSWORD=your_authorization_code
+NOTIFICATION__SMTP_HOST=smtp.163.com
+NOTIFICATION__SMTP_PORT=465
+NOTIFICATION__SMTP_STARTTLS=false  # 163 使用 SSL
+NOTIFICATION__SMTP_USER=your_email@163.com
+NOTIFICATION__SMTP_PASSWORD=your_authorization_code
 ```
 
 </details>

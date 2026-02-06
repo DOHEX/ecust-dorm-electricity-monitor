@@ -13,7 +13,7 @@ from ..exceptions import ClientError
 from ..logger import logger
 from ..models import ElectricityRecord
 from ..storage import CSVRepository
-from .base import check_client_config, console
+from .base import check_api_config, console
 from .display import display_power_result
 
 
@@ -27,17 +27,17 @@ def fetch_command(
 ) -> None:
     """获取当前电量"""
     # 检查配置
-    check_client_config()
+    check_api_config()
 
     try:
         # 创建客户端
         client = ElectricityClient(
-            sysid=config.client.sysid,
-            roomid=config.client.roomid,
-            areaid=config.client.areaid,
-            buildid=config.client.buildid,
-            timeout=config.client.timeout_seconds,
-            max_retries=config.client.max_retries,
+            sysid=config.api.sysid,
+            roomid=config.api.roomid,
+            areaid=config.api.areaid,
+            buildid=config.api.buildid,
+            timeout=config.api.timeout_seconds,
+            max_retries=config.api.max_retries,
         )
 
         console.print("[yellow]正在获取电量数据...[/yellow]")

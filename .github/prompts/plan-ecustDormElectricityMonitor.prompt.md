@@ -385,27 +385,27 @@
     # ===========================================
     # 电量获取配置（必需）
     # ===========================================
-    FETCHER_SYSID=1
-    FETCHER_ROOMID=511
-    FETCHER_AREAID=2
-    FETCHER_BUILDID=46
+    API__SYSID=1
+    API__ROOMID=511
+    API__AREAID=2
+    API__BUILDID=46
     
     # ===========================================
     # 邮件通知配置（可选）
     # ===========================================
-    NOTIFICATION_ENABLE_EMAIL=false
-    NOTIFICATION_SMTP_SERVER=smtp.gmail.com
-    NOTIFICATION_SMTP_PORT=587
-    NOTIFICATION_SMTP_USERNAME=your-email@gmail.com
-    NOTIFICATION_SMTP_PASSWORD=your-app-password  # Gmail App Password
-    NOTIFICATION_EMAIL_FROM=your-email@gmail.com
-    NOTIFICATION_EMAIL_TO=recipient@gmail.com
+    NOTIFICATION__CHANNELS=["email"]
+    NOTIFICATION__SMTP_HOST=smtp.gmail.com
+    NOTIFICATION__SMTP_PORT=587
+    NOTIFICATION__SMTP_STARTTLS=true
+    NOTIFICATION__SMTP_USER=your-email@gmail.com
+    NOTIFICATION__SMTP_PASSWORD=your-app-password  # Gmail App Password
+    NOTIFICATION__RECIPIENTS=["recipient@gmail.com"]
     
     # ===========================================
     # 应用配置（可选，覆盖 config.toml）
     # ===========================================
-    APP_ALERT_THRESHOLD=10.0
-    APP_LOG_LEVEL=INFO
+    APP__ALERT_THRESHOLD_KWH=10.0
+    APP__LOG_LEVEL=INFO
     
     # ===========================================
     # Web 看板认证（可选）

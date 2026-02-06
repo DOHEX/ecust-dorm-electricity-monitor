@@ -17,21 +17,21 @@ from ..config import ENV_FILE, config
 console = Console()
 
 
-def check_client_config() -> None:
-    """检查客户端配置是否完整
+def check_api_config() -> None:
+    """检查 API 配置是否完整
 
     Raises:
         typer.Exit: 如果配置不完整，显示错误信息并退出
     """
-    if not config.client.is_configured:
+    if not config.api.is_configured:
         console.print(
             Panel.fit(
                 "[bold red]⚠️  配置不完整[/bold red]\n\n"
                 f"请先配置以下必需参数：\n"
-                f"  • CLIENT_SYSID    - 系统ID\n"
-                f"  • CLIENT_ROOMID   - 房间ID\n"
-                f"  • CLIENT_AREAID   - 区域ID\n"
-                f"  • CLIENT_BUILDID  - 建筑ID\n\n"
+                f"  • API__SYSID    - 系统ID\n"
+                f"  • API__ROOMID   - 房间ID\n"
+                f"  • API__AREAID   - 区域ID\n"
+                f"  • API__BUILDID  - 建筑ID\n\n"
                 f"[dim]配置方式（任选其一）：[/dim]\n"
                 f"  1. 运行 [cyan]emon init[/cyan] 交互式配置\n"
                 f"  2. 编辑 [cyan]{ENV_FILE}[/cyan] 文件\n"

@@ -24,15 +24,15 @@ def init_command(
         console.print(f"[yellow]⚠️  配置文件已存在: {ENV_FILE}[/yellow]")
 
         # 检查是否已完整配置
-        if config.client.is_configured:
+        if config.api.is_configured:
             console.print("[green]✓ 配置已完整，可以直接使用 `emon fetch` 测试[/green]")
 
             # 显示当前配置
             console.print("\n[dim]当前配置：[/dim]")
-            console.print(f"  CLIENT_SYSID:   [cyan]{config.client.sysid}[/cyan]")
-            console.print(f"  CLIENT_ROOMID:  [cyan]{config.client.roomid}[/cyan]")
-            console.print(f"  CLIENT_AREAID:  [cyan]{config.client.areaid}[/cyan]")
-            console.print(f"  CLIENT_BUILDID: [cyan]{config.client.buildid}[/cyan]")
+            console.print(f"  API__SYSID:   [cyan]{config.api.sysid}[/cyan]")
+            console.print(f"  API__ROOMID:  [cyan]{config.api.roomid}[/cyan]")
+            console.print(f"  API__AREAID:  [cyan]{config.api.areaid}[/cyan]")
+            console.print(f"  API__BUILDID: [cyan]{config.api.buildid}[/cyan]")
 
             console.print("\n[dim]使用 [cyan]emon init --force[/cyan] 可重新配置[/dim]")
             raise typer.Exit(0)
@@ -58,10 +58,10 @@ def init_command(
 
     # 交互式输入
     try:
-        sysid = typer.prompt("系统ID (sysid)", default=config.client.sysid or "")
-        roomid = typer.prompt("房间ID (roomid)", default=config.client.roomid or "")
-        areaid = typer.prompt("区域ID (areaid)", default=config.client.areaid or "")
-        buildid = typer.prompt("建筑ID (buildid)", default=config.client.buildid or "")
+        sysid = typer.prompt("系统ID (sysid)", default=config.api.sysid or "")
+        roomid = typer.prompt("房间ID (roomid)", default=config.api.roomid or "")
+        areaid = typer.prompt("区域ID (areaid)", default=config.api.areaid or "")
+        buildid = typer.prompt("建筑ID (buildid)", default=config.api.buildid or "")
 
         # 验证输入
         if not all([sysid.strip(), roomid.strip(), areaid.strip(), buildid.strip()]):
@@ -77,29 +77,30 @@ def init_command(
 # ECUST API 配置（必填）
 # =============================================================================
 
-CLIENT_SYSID={sysid.strip()}
-CLIENT_ROOMID={roomid.strip()}
-CLIENT_AREAID={areaid.strip()}
-CLIENT_BUILDID={buildid.strip()}
+API__SYSID={sysid.strip()}
+API__ROOMID={roomid.strip()}
+API__AREAID={areaid.strip()}
+API__BUILDID={buildid.strip()}
 
 # =============================================================================
 # 应用配置（可选）
 # =============================================================================
 
-# APP_ALERT_THRESHOLD=30.0
-# APP_CHECK_INTERVAL_SECONDS=3600
-# APP_LOG_LEVEL=INFO
+# APP__ALERT_THRESHOLD_KWH=30.0
+# APP__CHECK_INTERVAL_SECONDS=3600
+# APP__LOG_LEVEL=INFO
 
 # =============================================================================
 # 邮件通知配置（可选）
 # =============================================================================
 
-# NOTIFICATION_SMTP_HOST=smtp.gmail.com
-# NOTIFICATION_SMTP_PORT=587
-# NOTIFICATION_SMTP_USE_TLS=true
-# NOTIFICATION_SMTP_USER=your_email@gmail.com
-# NOTIFICATION_SMTP_PASSWORD=your_app_password
-# NOTIFICATION_RECIPIENTS=recipient@example.com
+# NOTIFICATION__CHANNELS=["email", "serverchan"]
+# NOTIFICATION__SMTP_HOST=smtp.gmail.com
+# NOTIFICATION__SMTP_PORT=587
+# NOTIFICATION__SMTP_STARTTLS=true
+# NOTIFICATION__SMTP_USER=your_email@gmail.com
+# NOTIFICATION__SMTP_PASSWORD=your_app_password
+# NOTIFICATION__RECIPIENTS=["recipient@example.com"]
 """
 
         # 写入文件

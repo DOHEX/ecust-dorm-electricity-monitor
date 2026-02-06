@@ -23,7 +23,7 @@ def info_command() -> None:
         config_table.add_column("配置项", style="dim")
         config_table.add_column("值")
 
-        config_table.add_row("告警阈值", f"{config.app.alert_threshold} 度")
+        config_table.add_row("告警阈值", f"{config.app.alert_threshold_kwh} 度")
         config_table.add_row("检查间隔", f"{config.app.check_interval_seconds} 秒")
         config_table.add_row("日志级别", config.app.log_level)
         config_table.add_row("数据目录", str(config.storage.data_dir))
@@ -57,7 +57,7 @@ def info_command() -> None:
                 # 状态
                 status = (
                     "🔴 低电量"
-                    if latest.power < config.app.alert_threshold
+                    if latest.power < config.app.alert_threshold_kwh
                     else "🟢 正常"
                 )
                 stats_table.add_row("当前状态", status)
